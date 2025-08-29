@@ -43,7 +43,7 @@ async def SKUValidate(dep: ProductDetails):
     tmp = dep.model_dump()
     for product in app.state.products:
         if tmp['sku'] == product['sku']:
-            raise HTTPException(status_code=400, detail="SKU already present!")
+            raise HTTPException(status_code=409, detail="SKU already present!")
     del tmp
     return dep
 
@@ -92,6 +92,8 @@ async def delete_product(id: int):
         return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content={"detail": "Delete Operation Successfull!"})
     except:
         raise HTTPException(status_code=404, detail=f"Product ID {id} not found!")
+
+
 
 # @app.get("/")
 # async def root():
