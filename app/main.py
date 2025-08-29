@@ -68,34 +68,34 @@ async def get_products():
 
 @app.get("/products/{id}")
 async def get_product(id: int):
-    if app.state.products.get(id-1, None) != None:
-        return JSONResponse(status_code=200, content=app.state.products[id-1])
-    # for product in app.state.products:
-    #     if product['id'] == id:
-    #         return JSONResponse(status_code=200, content=product)
-    raise HTTPException(status_code=404, detail=f"Product ID {id} not found!")
+    try:
+        return JSONResponse(status_code=200, content=app.state.products[id])
+    except:
+        raise HTTPException(status_code=404, detail=f"Product ID {id} not found!")
 
 @app.put("/products/{id}")
 async def update_product(id: int, product: ProductDetails):
-    if app.state.products.get(id-1, None) == None:
+    try:
+        stored_data_dict = app.state.products[id]
+        stored_data_model = Product(**stored_data_dict)
+        update_data = product.model_dump(exclude_unset=True)
+        updated_item = stored_data_model.model_copy(update=update_data)
+        app.state.products[id-1] = updated_item.model_dump()
+        return JSONResponse(status_code=200, content={"detail": f"Product ID {id} Udpated!"})
+    except:
         raise HTTPException(status_code=404, detail=f"Product ID {id} not found!")
-    stored_data_dict = app.state.products[id-1]
-    stored_data_model = Product(**stored_data_dict)
-    update_data = product.model_dump(exclude_unset=True)
-    updated_item = stored_data_model.model_copy(update=update_data)
-    app.state.products[id-1] = updated_item.model_dump()
-    return JSONResponse(status_code=200, content={"detail": f"Product ID {id} Udpated!"})
 
 @app.delete("/products/{id}")
 async def delete_product(id: int):
-    if app.state.products.get(id-1, None) == None:
+    try:
+        app.state.products.pop(id)
+        return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content={"detail": "Delete Operation Successfull!"})
+    except:
         raise HTTPException(status_code=404, detail=f"Product ID {id} not found!")
-    app.state.products.pop(id-1)
-    return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content={"detail": "Delete Operation Successfull!"})
 
-@app.get("/")
-async def root():
-    return {"Hello": f"World"}
+# @app.get("/")
+# async def root():
+#     return {"Hello": f"World"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
