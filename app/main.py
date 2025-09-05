@@ -93,7 +93,17 @@ async def delete_product(id: int):
     except:
         raise HTTPException(status_code=404, detail=f"Product ID {id} not found!")
 
+@app.post("/orders/", status_code=status.HTTP_201_CREATED)
+async def create_order(order: Order):
+    pass
 
+@app.get("/orders/{id}", status_code=status.HTTP_200_OK)
+async def get_order(order: Order):
+    pass
+
+@app.get("/orders/{id}", status_code=status.HTTP_200_OK)
+async def get_order(order: Order):
+    pass
 
 # @app.get("/")
 # async def root():
